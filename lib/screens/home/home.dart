@@ -49,7 +49,7 @@ class _HomeState extends State<Home> {
         appBar: AppBar(
           backgroundColor: Colors.deepPurple[600],
           title: const Text(
-            'Frendfo',
+            'Frenfo',
             style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -64,7 +64,7 @@ class _HomeState extends State<Home> {
                       )));
               setState(() {});
             },
-            child: Text('Add')),
+            child: const Icon(Icons.add)),
         body: RefreshIndicator(
           onRefresh: _handleRefresh,
           child: FutureBuilder<List<Contact>>(

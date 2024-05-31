@@ -44,7 +44,7 @@ class ContactList extends StatelessWidget {
               convertToTitleCase(contacts[index].firstname),
               style: const TextStyle(
                   color: Colors.black,
-                  fontSize: 24.0,
+                  fontSize: 20.0,
                   fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
@@ -59,18 +59,33 @@ class ContactList extends StatelessWidget {
                       return AlertDialog(
                         content: const Text('Are you sure you want to delete?'),
                         actions: [
-                          ElevatedButton(
-                              onPressed: () {
-                                contactDao.deleteContact(contacts[index].id!);
+                          TextButton.icon(
+                            style: TextButton.styleFrom(
+                              tapTargetSize: MaterialTapTargetSize
+                                  .shrinkWrap, // Reduce button size
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0), // Add padding
+                              backgroundColor:
+                                  Colors.red[200], // Set background color
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    8.0), // Add rounded corners
+                              ),
+                            ),
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              contactDao.deleteContact(contacts[index].id!);
 
-                                Navigator.of(context).pop(true);
-                              },
-                              child: const Text('Yes')),
-                          ElevatedButton(
+                              Navigator.of(context).pop(true);
+                            },
+                            label: const Text('Delete'),
+                          ),
+                          TextButton.icon(
+                              icon: const Icon(Icons.cancel),
                               onPressed: () {
                                 Navigator.of(context).pop(false);
                               },
-                              child: const Text('No')),
+                              label: const Text('Cancel')),
                         ],
                       );
                     }).then((result) {

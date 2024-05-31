@@ -25,9 +25,7 @@ class _ContactDetailsState extends State<ContactDetails> {
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (image == null) return;
       final imageTemp = File(image.path);
-      setState(
-        () => this.editImage = imageTemp,
-      );
+      setState(() => this.editImage = imageTemp);
     } catch (e) {
       print(e);
     }
@@ -35,10 +33,10 @@ class _ContactDetailsState extends State<ContactDetails> {
 
   DateTime selectedDate = DateTime.now();
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController firstnameCont = TextEditingController();
-  late TextEditingController lastnameCont = TextEditingController();
-  late TextEditingController emailCont = TextEditingController();
-  late TextEditingController phoneCont = TextEditingController();
+  late TextEditingController firstnameCont;
+  late TextEditingController lastnameCont;
+  late TextEditingController emailCont;
+  late TextEditingController phoneCont;
 
   @override
   void initState() {
@@ -54,26 +52,54 @@ class _ContactDetailsState extends State<ContactDetails> {
   void editBtnPressed() => showDialog(
           context: context,
           builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 content: Form(
                     key: _formKey,
-                    child: SizedBox(
-                      height: 300,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: firstnameCont,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextFormField(
+                          controller: firstnameCont,
+                          decoration: InputDecoration(
+                            labelText: 'First Name',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                          TextFormField(
-                            controller: lastnameCont,
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          controller: lastnameCont,
+                          decoration: InputDecoration(
+                            labelText: 'Last Name',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                          TextFormField(
-                            controller: emailCont,
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          controller: emailCont,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                          TextFormField(
-                            controller: phoneCont,
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          controller: phoneCont,
+                          decoration: InputDecoration(
+                            labelText: 'Phone',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     )),
                 actions: [
                   TextButton(
@@ -108,144 +134,134 @@ class _ContactDetailsState extends State<ContactDetails> {
     MediaQueryData queryData = MediaQuery.of(context);
 
     return Scaffold(
-        body: SafeArea(
-      child: Column(
-        children: [
-          Hero(
-              tag: widget.contact.id.toString(),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Hero(
+                tag: widget.contact.id.toString(),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30)),
-                child: widget.contact.image != null
-                    ? Image.file(
-                        File(widget.contact.image!),
-                        height: queryData.size.height / 3,
-                        width: queryData.size.width,
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        color: Colors.blue,
-                        width: queryData.size.width,
-                        height: 400,
-                        child: Center(
-                          child: Text(
-                            widget.contact.firstname.substring(0, 1),
-                            style: const TextStyle(fontSize: 40.0),
+                    bottomRight: Radius.circular(30),
+                  ),
+                  child: widget.contact.image != null
+                      ? Image.file(
+                          File(widget.contact.image!),
+                          height: queryData.size.height / 3,
+                          width: queryData.size.width,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          color: Colors.blue,
+                          width: queryData.size.width,
+                          height: queryData.size.height / 3,
+                          child: Center(
+                            child: Text(
+                              widget.contact.firstname.substring(0, 1),
+                              style: const TextStyle(
+                                  fontSize: 40.0, color: Colors.white),
+                            ),
                           ),
                         ),
-                      ),
-              )),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(children: [
-              ElevatedButton(
-                  onPressed: () async {
-                    await pickImage();
-                    if (editImage != null) {
-                      showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                                content: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Image.file(File(editImage!.path)),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        await pickImage();
+                        if (editImage != null) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              content: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.file(File(editImage!.path)),
+                              ),
+                              actions: [
+                                TextButton.icon(
+                                  onPressed: () {
+                                    if (editImage != null) {
+                                      final res = contactDao.changeImage(
+                                        widget.contact.id!,
+                                        editImage!.path,
+                                      );
+                                      Navigator.of(context).pop(true);
+                                      widget.editFired();
+                                      Navigator.of(context).pop(true);
+                                    }
+                                  },
+                                  icon: const Icon(Icons.save),
+                                  label: const Text('Save'),
                                 ),
-                                actions: [
-                                  TextButton.icon(
-                                      onPressed: () {
-                                        if (editImage != null) {
-                                          final res = contactDao.changeImage(
-                                              widget.contact.id!,
-                                              editImage!.path);
-                                          Navigator.of(context).pop(true);
-                                          widget.editFired();
-                                          Navigator.of(context).pop(true);
-                                        }
-                                      },
-                                      label: Text('Save'),
-                                      icon: Icon(Icons.save)),
-                                  TextButton.icon(
-                                      onPressed: () {
-                                        editImage = null;
-                                        Navigator.of(context).pop(false);
-                                      },
-                                      label: Text('Cancel'),
-                                      icon: Icon(Icons.cancel))
-                                ],
-                              ));
-                    }
-                  },
-                  child: const Text('Edit Photo')),
-              Container(
-                  child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Name: ',
-                    style:
-                        TextStyle(fontSize: 24.0, fontWeight: FontWeight.w500),
-                  ),
-                  Expanded(
-                    child: Text(convertToTitleCase(
-                        "${widget.contact.firstname} ${widget.contact.lastname}"
-                            .toString())),
-                  )
-                ],
-              )),
-              Container(
-                  child: Row(
-                children: [
-                  const Text(
-                    'Email: ',
-                    style:
-                        TextStyle(fontSize: 24.0, fontWeight: FontWeight.w500),
-                  ),
-                  Expanded(
-                    child: Text(
-                      widget.contact.email,
+                                TextButton.icon(
+                                  onPressed: () {
+                                    editImage = null;
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  icon: const Icon(Icons.cancel),
+                                  label: const Text('Cancel'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Change Photo'),
                     ),
-                  )
-                ],
-              )),
-              Container(
-                  child: Row(
-                children: [
-                  const Text(
-                    'Phone Number: ',
-                    style:
-                        TextStyle(fontSize: 24.0, fontWeight: FontWeight.w500),
-                  ),
-                  Expanded(
-                    child: Text(widget.contact.phone),
-                  )
-                ],
-              )),
-              Container(
-                  child: Row(
-                children: [
-                  const Text(
-                    'Date: ',
-                    style:
-                        TextStyle(fontSize: 24.0, fontWeight: FontWeight.w500),
-                  ),
-                  Expanded(
-                    child:
-                        Text(selectedDate.toLocal().toString().split(' ')[0]),
-                  )
-                ],
-              )),
-              Row(
-                children: [
-                  TextButton.icon(
+                    const SizedBox(height: 20),
+                    buildInfoRow(
+                        'Name:',
+                        convertToTitleCase(
+                            '${widget.contact.firstname} ${widget.contact.lastname}')),
+                    const SizedBox(height: 10),
+                    buildInfoRow('Email:', widget.contact.email),
+                    const SizedBox(height: 10),
+                    buildInfoRow('Phone Number:', widget.contact.phone),
+                    const SizedBox(height: 10),
+                    buildInfoRow('Date:',
+                        selectedDate.toLocal().toString().split(' ')[0]),
+                    const SizedBox(height: 20),
+                    TextButton.icon(
                       icon: const Icon(Icons.edit),
                       onPressed: editBtnPressed,
-                      label: const Text('Edit Details')),
-                ],
+                      style: TextButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 16.0),
+                      ),
+                      label: const Text('Edit Details'),
+                    ),
+                  ],
+                ),
               ),
-            ]),
-          )
-        ],
+            ],
+          ),
+        ),
       ),
-    ));
+    );
+  }
+
+  Widget buildInfoRow(String label, String value) {
+    return Row(
+      children: [
+        Text(
+          '$label ',
+          style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 18.0),
+          ),
+        ),
+      ],
+    );
   }
 }

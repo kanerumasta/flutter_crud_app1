@@ -27,6 +27,18 @@ class ContactDAO {
     }
   }
 
+  Future<bool> isDuplicate(String email) async {
+    final db = await dbHelper.database;
+    try {
+      var res =
+          await db.query('contacts', where: 'email = ?', whereArgs: [email]);
+      return res.isNotEmpty;
+    } catch (e) {
+      print(e);
+    }
+    return false;
+  }
+
   Future<void> changeImage(int id, String image) async {
     final db = await dbHelper.database;
     try {
